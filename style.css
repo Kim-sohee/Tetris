@@ -19,6 +19,18 @@
     color: white;
     left: 15%;
 }
+#aside button{
+    width: 200px;
+    height: 50px;
+    border-radius: 30px;
+    background-color:snow;
+    position: absolute;
+    left: 50px;
+    top: 85%;
+}
+#aside button:hover{
+    background-color: yellow;
+}
 #hold{
     top: 5%;
 }
