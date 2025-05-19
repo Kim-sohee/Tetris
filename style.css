@@ -1,0 +1,33 @@
+#wrapper{
+    width: 1000px;
+    height: 700px;
+    background-color: gray;
+    margin: auto;
+}
+#aside{
+    width: 30%;
+    height: 100%;
+    background-color: black;
+    float: left;
+    position: relative;
+}
+#aside div{
+    border: 1px solid white;
+    position: absolute;
+    width: 200px;
+    text-align: center;
+    color: white;
+    left: 15%;
+}
+#hold{
+    top: 5%;
+}
+#data{
+    top: 30%;
+}
+#content{
+    width: 70%;
+    height: 100%;
+    background-color: silver;
+    float: left;
+}
