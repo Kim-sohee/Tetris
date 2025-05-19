@@ -42,4 +42,29 @@
     height: 100%;
     background-color: silver;
     float: left;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#gameContainer{
+    position: relative;
+    width: 300px;
+    height: 600px;
+    border: 2px solid #000;
+}
+#gameBoard{
+    display: grid;
+    grid-template-columns: repeat(10, 30px);
+    grid-template-rows: repeat(20, 30px);
+    gap: 1px;
+}
+.grid-cell{
+    width: 30px;
+    height: 30px;
+    background-color: #eee;
+    border: 1px solid #ddd;
+}
+
+.filled{
+    background-color: #333;
 }

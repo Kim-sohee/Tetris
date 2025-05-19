@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="./style.css">
-
+    <script src="./Block.js"></script>
     <script>
+        //gameloop
+        function gameLoop(){
+
+        }
+
+        //로드 될 때
         addEventListener("load", function(){
             //초기화
 
@@ -14,6 +20,20 @@
             //Game Start 버튼 클릭 시
             document.querySelector("#aside button").addEventListener("click", ()=>{
                 //여기에 게임 시작
+            });
+
+            //키보드 입력 처리
+            document.addEventListener('keydown', (e)=>{
+                console.log(e.keyCode);
+                switch(e.keyCode){
+                    case 37:    //left
+                    case 39:    //right
+                    case 38:    //up
+                    case 40:    //down
+                    case 32:    //space
+                    case 27:    //esc
+
+                }
             });
         });
     </script>
@@ -29,7 +49,11 @@
             </div>
             <button>GAME START</button>
         </div>
-        <div id="content"></div>
+        <div id="content">
+            <div id="gameContainer">
+                <div id="gameBoard"></div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
