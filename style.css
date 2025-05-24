@@ -1,44 +1,62 @@
 #wrapper{
-    width: 1000px;
+    width: 800px;
     height: 700px;
     background-color: gray;
     margin: auto;
 }
 #aside{
-    width: 30%;
+    width: 300px;
     height: 100%;
     background-color: black;
     float: left;
     position: relative;
 }
-#aside div{
+#hold, #data{
     border: 1px solid white;
     position: absolute;
     width: 200px;
     text-align: center;
     color: white;
     left: 15%;
+    border-radius: 30px;
+    top: 5%;
 }
+#hold div{
+    width: 170px;
+    height: 180px;
+    background-color: rgb(255, 255, 255, 0.3);
+    border-radius: 30px;
+    margin: auto;
+    margin-bottom: 10px;
+}
+#data{
+    top: 47%;
+}
+#data span{
+    display: inline-block;
+    width: 175px;
+    height: 50px;
+    background-color: rgb(255, 255, 255, 0.3);
+    border-radius: 30px;
+    margin-bottom: 5px;
+}
+
 #aside button{
-    width: 200px;
+    width: 240px;
     height: 50px;
     border-radius: 30px;
     background-color:snow;
     position: absolute;
-    left: 50px;
-    top: 85%;
+    left: 25px;
+    top: 88%;
+    font-size: 20px;
+    font-style: bold;
 }
 #aside button:hover{
     background-color: yellow;
 }
-#hold{
-    top: 5%;
-}
-#data{
-    top: 30%;
-}
 #content{
-    width: 70%;
+    width: 500px;
     height: 100%;
     background-color: silver;
     float: left;
@@ -51,6 +69,7 @@
     width: 300px;
     height: 600px;
     border: 2px solid #000;
+    background-color:#eee;
 }
 #gameBoard{
     display: grid;

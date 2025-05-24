@@ -3,10 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>테트리스 게임</title>
     <link rel="stylesheet" href="./style.css">
+    <script src="./common.js"></script>
     <script src="./Block.js"></script>
     <script>
+        let rows = 20;
+        let cols = 10;
+        let board = Array.from({length:rows}, ()=> Array(cols).fill(0));
+        let interval;
+
+        //블럭 생성
+        function createBlock(){
+            const tetroBlock = [
+                { shape: [[1, 1, 1], [0, 1, 0]], color: 'red' }, // T 모양
+                { shape: [[1, 1], [1, 1]], color: 'green' }, // O 모양
+                { shape: [[1, 0, 0], [1, 1, 1]], color: 'blue' }, // L 모양
+                { shape: [[0, 0, 1], [1, 1, 1]], color: 'yellow' }, // ㄱ 모양
+                { shape: [[1, 1, 1, 1]], color: 'purple'}, // I 모양
+                { shape: [[0, 1, 1], [1, 1, 0]], color: 'Lime'}, // ㄹ 모양
+                { shape: [[1, 1, 0], [0, 1, 1]], color: 'Salmon'} // ㄹ 모양
+            ];
+            const piece = tetroBlock[getRandom(tetroBlock.length)];
+            
+        }
+
         //gameloop
         function gameLoop(){
 
@@ -15,11 +36,12 @@
         //로드 될 때
         addEventListener("load", function(){
             //초기화
-
+            createBlock();  //블럭 생성
 
             //Game Start 버튼 클릭 시
             document.querySelector("#aside button").addEventListener("click", ()=>{
                 //여기에 게임 시작
+                
             });
 
             //키보드 입력 처리
@@ -42,10 +64,14 @@
     <div id="wrapper">
         <div id="aside">
             <div id="hold">
-                <h1>Test1</h1>
+                <h2>HOLD</h2>
+                <div></div>
             </div>
             <div id="data">
-                <h1>Test2</h1>
+                <h2>SCORE</h2>
+                <span></span>
+                <h2>LEVEL</h2>
+                <span></span>
             </div>
             <button>GAME START</button>
         </div>
