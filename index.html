@@ -6,6 +6,7 @@
     <title>테트리스 게임</title>
     <link rel="stylesheet" href="./style.css">
     <script src="./common.js"></script>
+    <script src="./GameObject.js"></script>
     <script src="./Block.js"></script>
     <script>
         //게임판 정의
@@ -15,6 +16,34 @@
 
         let blockSize = 30; //블록 사이즈
         let interval;
+
+        let score = 0;
+        let level = 1;
+
+        //게임판 격자 생성
+        function createBoard(){
+            let gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';   //기존 게임 보드 초기화
+
+            //각 셀을 화면에 그리기(20 * 10)
+            for(let i=0; i<rows; i++){
+                for(let j=0; j<cols; j++){
+                    let cell = document.createElement('div');
+                    cell.classList.add('grid-cell');
+                    if(board[i][j] !== 0){
+                        cell.classList.add('filled');
+                    }
+                    gameBoard.appendChild(cell);
+                }
+            }
+        }
+
+        //초기화 함수
+        function init(){
+            createBoard();
+            document.querySelector("#data span:nth-of-type(1)").innerText = score;
+            document.querySelector("#data span:nth-of-type(2)").innerText = level;
+        }
 
         //블럭 생성
         function createBlock(){
@@ -37,7 +66,7 @@
                         let x = j * blockSize + 90;   //중앙에서 시작하기
                         let y = i * blockSize;
 
-                        new Block(gameBoard, x, y, blockSize, blockSize, piece.color);
+                        new Block(gameBoard, x, y, blockSize, blockSize, 0, 0, piece.color);
                     }
                 }
             }
@@ -45,17 +74,17 @@
 
         //gameloop
         function gameLoop(){
-
+            createBlock();  //블럭 생성
         }
 
         //로드 될 때
         addEventListener("load", function(){
-            //초기화
-            createBlock();  //블럭 생성
+            //게임 판 준비
+            init();
 
             //Game Start 버튼 클릭 시
             document.querySelector("#aside button").addEventListener("click", ()=>{
-                //여기에 게임 시작
+                //게임 시작
                 
             });
 
