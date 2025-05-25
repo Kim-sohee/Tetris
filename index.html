@@ -22,7 +22,9 @@
         let score = 0;
         let level = 0;
 
-        //게임판 격자 생성
+        /*----------------------------------------------------------------------------
+            보드판 격자 생성 및 초기화
+        ----------------------------------------------------------------------------*/
         function createBoard(){
             let gameBoard = document.getElementById('gameBoard');
             gameBoard.innerHTML = '';   //기존 게임 보드 초기화
@@ -47,7 +49,9 @@
             document.querySelector("#data span:nth-of-type(2)").innerText = level;
         }
 
-        //블럭 생성
+        /*----------------------------------------------------------------------------
+            블럭 생성
+        ----------------------------------------------------------------------------*/
         function createBlock(){
             const tetroBlock = [
                 { shape: [[1, 1, 1], [0, 1, 0]], color: 'red' }, // T 모양
@@ -56,7 +60,7 @@
                 { shape: [[0, 0, 1], [1, 1, 1]], color: 'yellow' }, // ㄱ 모양
                 { shape: [[1, 1, 1, 1]], color: 'purple'}, // I 모양
                 { shape: [[0, 1, 1], [1, 1, 0]], color: 'Lime'}, // ㄹ 모양
-                { shape: [[1, 1, 0], [0, 1, 1]], color: 'Salmon'} // ㄹ 모양
+                { shape: [[1, 1, 0], [0, 1, 1]], color: 'Salmon'} // reverse ㄹ 모양
             ];
             let piece = tetroBlock[getRandom(tetroBlock.length-1)];
             let gameBoard = document.getElementById("gameBoard");
@@ -75,19 +79,48 @@
             }
         }
 
-        //바닥과 블럭 충돌검사
-        function collisionFloorCheck(block){
+        /*----------------------------------------------------------------------------
+            충돌 검사(충돌 시 return true)
+        ----------------------------------------------------------------------------*/
+        //아래 충돌
+        function collisionBottom(block){
             //바닥과 충돌
             if(block.y + block.height >= rows * blockSize) return true;
 
             //블럭 간섭
             let row = Math.floor((block.y + block.height) / blockSize);
             let col = Math.floor(block.x / blockSize);
+
+            //보드 밖으로 벗어남 확인
             if (row >= rows || col < 0 || col >= cols) return true;
+
+            //블럭이 있는지 확인
             return board[row][col] !== 0;
         }
+        //좌측 충돌
+        function collisionLeft(block){
+            let row = Math.floor(block.y / blockSize);
+            let col = Math.floor(block.x / blockSize);
 
-        //gameloop
+            if(col <= 0) return true; //왼쪽 벽 충돌
+
+            return board[row][col-1] !== 0; //블럭간 충돌 확인
+        }
+
+        //우측 충돌
+        function collisionRight(block){
+            let row = Math.floor(block.y / blockSize);
+            let col = Math.floor(block.x / blockSize);
+
+            if(col >= cols-1) return true;  //오른쪽 벽 충돌
+
+            return board[row][col-1] !== 0; //블럭간 충돌 확인
+        }
+
+
+        /*----------------------------------------------------------------------------
+            게임 루프 생성
+        ----------------------------------------------------------------------------*/
         function gameLoop(){
             if(fallingBlocks.length === 0){
                 createBlock();  //블럭 생성
@@ -99,7 +132,7 @@
             //블럭 아래로 떨어지기
             for(let i=0; i<fallingBlocks.length; i++){
                 let block = fallingBlocks[i];
-                if(!collisionFloorCheck(block)){
+                if(!collisionBottom(block)){
                     block.tick();
                 }else{
                     check = true;
@@ -124,7 +157,9 @@
             
         }
 
-        //로드 될 때
+        /*----------------------------------------------------------------------------
+            로드 시
+        ----------------------------------------------------------------------------*/
         addEventListener("load", function(){
             //게임 판 준비
             init();
@@ -147,7 +182,13 @@
             document.addEventListener('keydown', (e)=>{
                 console.log(e.keyCode);
                 switch(e.keyCode){
-                    case 37:    //left
+                    case 37:     //left
+                        for(let block of fallingBlocks){
+                            if(!collisionLeft(block)){
+                                block.x -= blockSize;
+                            }
+                        }
+                        break;
                     case 39:    //right
                     case 38:    //up
                     case 40:    //down
