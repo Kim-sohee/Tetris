@@ -8,9 +8,12 @@
     <script src="./common.js"></script>
     <script src="./Block.js"></script>
     <script>
-        let rows = 20;
-        let cols = 10;
+        //게임판 정의
+        let rows = 20;  //세로 20줄
+        let cols = 10;  //가로 10칸
         let board = Array.from({length:rows}, ()=> Array(cols).fill(0));
+
+        let blockSize = 30; //블록 사이즈
         let interval;
 
         //블럭 생성
@@ -24,8 +27,20 @@
                 { shape: [[0, 1, 1], [1, 1, 0]], color: 'Lime'}, // ㄹ 모양
                 { shape: [[1, 1, 0], [0, 1, 1]], color: 'Salmon'} // ㄹ 모양
             ];
-            const piece = tetroBlock[getRandom(tetroBlock.length)];
-            
+            let piece = tetroBlock[getRandom(tetroBlock.length-1)];
+            let gameBoard = document.getElementById("gameBoard");
+
+            //tetroBlock 배열에서 1인 곳마다 Block 생성
+            for(let i=0; i<piece.shape.length; i++){
+                for(let j=0; j<piece.shape[i].length; j++){
+                    if(piece.shape[i][j] == 1){
+                        let x = j * blockSize + 90;   //중앙에서 시작하기
+                        let y = i * blockSize;
+
+                        new Block(gameBoard, x, y, blockSize, blockSize, piece.color);
+                    }
+                }
+            }
         }
 
         //gameloop
@@ -52,8 +67,8 @@
                     case 39:    //right
                     case 38:    //up
                     case 40:    //down
-                    case 32:    //space
                     case 27:    //esc
+                    case 32:    //space
 
                 }
             });
