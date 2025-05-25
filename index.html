@@ -15,10 +15,12 @@
         let board = Array.from({length:rows}, ()=> Array(cols).fill(0));
 
         let blockSize = 30; //블록 사이즈
-        let interval;
+        let block;
+        let fallingBlocks = []; //모든 블럭 저장
+        let interval=null;
 
         let score = 0;
-        let level = 1;
+        let level = 0;
 
         //게임판 격자 생성
         function createBoard(){
@@ -66,15 +68,60 @@
                         let x = j * blockSize + 90;   //중앙에서 시작하기
                         let y = i * blockSize;
 
-                        new Block(gameBoard, x, y, blockSize, blockSize, 0, 0, piece.color);
+                        block = new Block(gameBoard, x, y, blockSize, blockSize, 0, 1, piece.color);
+                        fallingBlocks.push(block);
                     }
                 }
             }
         }
 
+        //바닥과 블럭 충돌검사
+        function collisionFloorCheck(block){
+            //바닥과 충돌
+            if(block.y + block.height >= rows * blockSize) return true;
+
+            //블럭 간섭
+            let row = Math.floor((block.y + block.height) / blockSize);
+            let col = Math.floor(block.x / blockSize);
+            if (row >= rows || col < 0 || col >= cols) return true;
+            return board[row][col] !== 0;
+        }
+
         //gameloop
         function gameLoop(){
-            createBlock();  //블럭 생성
+            if(fallingBlocks.length === 0){
+                createBlock();  //블럭 생성
+                return;
+            }
+
+            let check = false;
+
+            //블럭 아래로 떨어지기
+            for(let i=0; i<fallingBlocks.length; i++){
+                let block = fallingBlocks[i];
+                if(!collisionFloorCheck(block)){
+                    block.tick();
+                }else{
+                    check = true;
+                }
+                block.render();
+            }
+
+            if(check){
+                for(let i=0; i<fallingBlocks.length; i++){
+                    let block = fallingBlocks[i];
+
+                    let row = Math.floor(block.y / blockSize);
+                    let col = Math.floor(block.x / blockSize);
+                    if (row >= 0 && row < rows && col >= 0 && col < cols) {
+                        board[row][col] = 1;
+                        block.div.style.backgroundColor = '#4A4A4A';
+                    }
+                }
+                fallingBlocks = [];
+                createBlock();
+            }
+            
         }
 
         //로드 될 때
@@ -83,9 +130,17 @@
             init();
 
             //Game Start 버튼 클릭 시
-            document.querySelector("#aside button").addEventListener("click", ()=>{
+            let bt = document.querySelector("#aside button");
+            bt.addEventListener("click", ()=>{
                 //게임 시작
-                
+                if(interval == null){
+                    interval = setInterval(gameLoop, 10 - (level * 2));
+                    bt.innerText = "PAUSE";
+                }else{
+                    clearInterval(interval);
+                    interval = null;
+                    bt.innerText = "GAME START";
+                }
             });
 
             //키보드 입력 처리
@@ -96,7 +151,6 @@
                     case 39:    //right
                     case 38:    //up
                     case 40:    //down
-                    case 27:    //esc
                     case 32:    //space
 
                 }
