@@ -45,8 +45,9 @@
         //초기화 함수
         function init(){
             createBoard();
-            document.querySelector("#data span:nth-of-type(1)").innerText = score;
-            document.querySelector("#data span:nth-of-type(2)").innerText = level;
+            score = 0; level = 0;
+            document.querySelector("#data span:nth-of-type(1)").innerText = score;  //score
+            document.querySelector("#data span:nth-of-type(2)").innerText = level;  //level
         }
 
         /*----------------------------------------------------------------------------
@@ -97,32 +98,6 @@
             //블럭이 있는지 확인
             return board[row][col] !== 0; 
         }
-        
-        // //좌측 충돌
-        // function collisionLeft(blockArray){
-        //     for(let block of blockArray){
-        //         let row = Math.floor(block.y / blockSize);
-        //         let col = Math.floor(block.x / blockSize);
-
-        //         if(col <= 0) return true;
-
-        //         return board[row][col-1] !== 0;
-        //     }
-        //     return false;
-        // }
-
-        // //우측 충돌
-        // function collisionRight(blockArray){
-        //     for(let block of blockArray){
-        //         let row = Math.floor(block.y / blockSize);
-        //         let col = Math.floor(block.x / blockSize);
-    
-        //         if(col >= cols-2) return true;  //오른쪽 벽 충돌
-    
-        //         return board[row][col-1] !== 0; //블럭간 충돌 확인
-        //     }
-        //     return false;
-        // }
 
         //좌우측 충돌
         function collisionSide(blockArray, flag){
@@ -145,21 +120,48 @@
             
         }
 
-        //test
-        function canMove(blockArr){
-            for(let block of blockArr){
-                if(collisionLeft(block)){
-                    return false;
+        /*----------------------------------------------------------------------------
+            블럭 회전하기
+        ----------------------------------------------------------------------------*/
+        function rotationBlock(){
+            console.log("난 회전하는 함수, 호출했냐?");
+        }
+
+        /*----------------------------------------------------------------------------
+            하드 드롭(hard drop): 아래 무엇인가 충돌할 때까지 떨어짐
+                -> 스페이스 누를 시 호출
+        ----------------------------------------------------------------------------*/
+        function hardDrop(){
+            //최상단에서 밑바닥까지의 최단거리;
+            let bottom = rows * blockSize;
+            for(let block of fallingBlocks){
+                let drop = 0;
+                let tempY = block.y;
+
+                while(true){
+                    tempY += blockSize;
+                    let row = Math.floor(tempY / blockSize);
+                    let col = Math.floor(block.x / blockSize);
+
+                    if(row >= rows || board[row][col-1]!==0) break;
+                    drop += blockSize;
+                }
+                if(drop < bottom) bottom = drop;
+            }
+
+            for(let block of fallingBlocks){
+                if(!collisionBottom(block)){
+                    block.y += (bottom-blockSize); //여기에 변수 설정;
                 }
             }
-            return true;
         }
 
         /*----------------------------------------------------------------------------
             게임 오버
         ----------------------------------------------------------------------------*/
         function gameOver(){
-            
+            alert("GAME OVER!\n당신의 최종 점수는 "+score+"점 입니다.");
+            init(); //초기화
         }
 
         /*----------------------------------------------------------------------------
@@ -224,7 +226,6 @@
 
             //키보드 입력 처리
             document.addEventListener('keydown', (e)=>{
-                console.log(e.keyCode);
                 switch(e.keyCode){
                     case 37:     //left
                     if(!collisionSide(fallingBlocks, "left")){
@@ -241,6 +242,7 @@
                         }
                         break;
                     case 38:    //up 
+                        rotationBlock();
                         break;
                     case 40:    //down 
                         for(let block of fallingBlocks){
@@ -250,6 +252,8 @@
                         }
                         break;
                     case 32:    //space 
+                        hardDrop();
+                        e.preventDefault(); //스페이스로 버튼 눌림 방지
                         break;
 
                 }
