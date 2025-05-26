@@ -95,28 +95,72 @@
             if (row >= rows || col < 0 || col >= cols) return true;
 
             //블럭이 있는지 확인
-            return board[row][col] !== 0;
+            return board[row][col] !== 0; 
         }
-        //좌측 충돌
-        function collisionLeft(block){
-            let row = Math.floor(block.y / blockSize);
-            let col = Math.floor(block.x / blockSize);
+        
+        // //좌측 충돌
+        // function collisionLeft(blockArray){
+        //     for(let block of blockArray){
+        //         let row = Math.floor(block.y / blockSize);
+        //         let col = Math.floor(block.x / blockSize);
 
-            if(col <= 0) return true; //왼쪽 벽 충돌
+        //         if(col <= 0) return true;
 
-            return board[row][col-1] !== 0; //블럭간 충돌 확인
+        //         return board[row][col-1] !== 0;
+        //     }
+        //     return false;
+        // }
+
+        // //우측 충돌
+        // function collisionRight(blockArray){
+        //     for(let block of blockArray){
+        //         let row = Math.floor(block.y / blockSize);
+        //         let col = Math.floor(block.x / blockSize);
+    
+        //         if(col >= cols-2) return true;  //오른쪽 벽 충돌
+    
+        //         return board[row][col-1] !== 0; //블럭간 충돌 확인
+        //     }
+        //     return false;
+        // }
+
+        //좌우측 충돌
+        function collisionSide(blockArray, flag){
+            for(let block of blockArray){
+                let row = Math.floor(block.y / blockSize);
+                let col = Math.floor(block.x / blockSize);
+
+                if(flag == "left"){ //좌측 충돌
+                    if(col <= 0 || board[row][col-1]!==0) return true;
+                }else if(flag == "right"){  //우측 충돌
+                    if(col >= cols-1 || board[row][col+1]!==0) return true;
+                }
+                // return board[row][col-1] !== 0; //블럭 확인
+            }
+            return false;
         }
 
-        //우측 충돌
-        function collisionRight(block){
-            let row = Math.floor(block.y / blockSize);
-            let col = Math.floor(block.x / blockSize);
-
-            if(col >= cols-1) return true;  //오른쪽 벽 충돌
-
-            return board[row][col-1] !== 0; //블럭간 충돌 확인
+        //위쪽 충돌(GameOver)
+        function collisionTop(block){
+            
         }
 
+        //test
+        function canMove(blockArr){
+            for(let block of blockArr){
+                if(collisionLeft(block)){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /*----------------------------------------------------------------------------
+            게임 오버
+        ----------------------------------------------------------------------------*/
+        function gameOver(){
+            
+        }
 
         /*----------------------------------------------------------------------------
             게임 루프 생성
@@ -183,16 +227,30 @@
                 console.log(e.keyCode);
                 switch(e.keyCode){
                     case 37:     //left
+                    if(!collisionSide(fallingBlocks, "left")){
                         for(let block of fallingBlocks){
-                            if(!collisionLeft(block)){
                                 block.x -= blockSize;
                             }
                         }
                         break;
                     case 39:    //right
-                    case 38:    //up
-                    case 40:    //down
-                    case 32:    //space
+                    if(!collisionSide(fallingBlocks, "right")){
+                        for(let block of fallingBlocks){
+                                block.x += blockSize;
+                            }
+                        }
+                        break;
+                    case 38:    //up 
+                        break;
+                    case 40:    //down 
+                        for(let block of fallingBlocks){
+                            if(!collisionBottom(block)){
+                                block.y += blockSize;
+                            }
+                        }
+                        break;
+                    case 32:    //space 
+                        break;
 
                 }
             });
