@@ -123,14 +123,55 @@
         /*----------------------------------------------------------------------------
             블럭 회전하기
         ----------------------------------------------------------------------------*/
-        function rotationBlock(){
+        function rotationBlock(blockArray){
             /*방법1) Block객체를 BlockGroup으로 묶어서 처리하기
                 -> (장점) 코드 간결화, 유지보수성 향상, 식별성 향상 
                 -> (단점) 대공사.. 대부분의 코드를 뜯어 고쳐야 함
               방법2) 객체 자체의 x, y값을 변경하기
                 -> (장점) 기존의 코드 변경 없이 작성 가능
                 -> (단점) 복잡한 로직, 더러운 코드, 식별성 저하, 유지보수성 저하 */
-            
+            let centerX = 0;
+            let centerY = 0;
+
+            for(let block of blockArray){
+                centerX += block.x;
+                centerY += block.y;
+            }
+            centerX /= blockArray.length;
+            centerY /= blockArray.length;
+
+            let rotated = blockArray.map(block=>{
+                let relX = block.x - centerX;
+                let relY = block.y - centerY;
+
+                // 90도 회전 좌표 (시계방향)
+                let newX = centerX - relY;
+                let newY = centerY + relX;
+
+                return {
+                    ...block,
+                    x: newX,
+                    y: newY
+                };
+            });
+            // 회전 후 충돌 체크
+            let isValid = true;
+            for(let b of rotated){
+                let row = Math.floor(b.y / blockSize);
+                let col = Math.floor(b.x / blockSize);
+                if(row < 0 || row >= rows || col < 0 || col >= cols || board[row][col] !== 0){
+                    isValid = false;
+                    break;
+                }
+            }
+
+            // 충돌 없으면 실제 좌표 반영
+            if(isValid){
+                for(let i = 0; i < blockArray.length; i++){
+                    blockArray[i].x = rotated[i].x;
+                    blockArray[i].y = rotated[i].y;
+                }
+            }
         }
 
         /*----------------------------------------------------------------------------
@@ -159,6 +200,40 @@
                 if(!collisionBottom(block)){
                     //y값 지정
                     block.y += (bottom-blockSize);  //아래로 떨어지는 거리 보정
+                }
+            }
+        }
+
+        /*----------------------------------------------------------------------------
+            한 줄 채우면 삭제
+        ----------------------------------------------------------------------------*/
+        //줄 삭제 후 블럭 아래로 이동
+        function clearLine(line) {
+            for (let r = line; r > 0; r--) {
+                for (let c = 0; c < cols; c++) {
+                    board[r][c] = board[r - 1][c];
+                }
+            }
+
+            // 맨 위 줄은 비워줌
+            for (let c = 0; c < cols; c++) {
+                board[0][c] = 0;
+            }
+        }
+        // 줄이 가득 찼는지 검사
+        function checkClearLines(){
+            for (let row = rows - 1; row >= 0; row--) {
+                let isFull = true;
+
+                for (let col = 0; col < cols; col++) {
+                    if (board[row][col] === 0) {
+                        isFull = false;
+                        break;
+                    }
+                }
+                if (isFull) {
+                    clearLine(row);
+                    row++;  // 삭제 후 아래 줄을 다시 검사해야 하므로 인덱스를 다시 증가시킴
                 }
             }
         }
@@ -205,6 +280,7 @@
                     }
                 }
                 fallingBlocks = [];
+                checkClearLines();
                 createBlock();
             }
             
@@ -249,7 +325,7 @@
                         }
                         break;
                     case 38:    //up 
-                        rotationBlock();
+                        rotationBlock(fallingBlocks);
                         break;
                     case 40:    //down 
                         for(let block of fallingBlocks){
