@@ -24,6 +24,9 @@
         let level = 0;
         let gameOverFlag = false;   //게임이 오버되었는지 확인
 
+        let holdPiece = null;   //보관 중인 블럭 정보
+        let canHold = true;     //한 턴에 한 번만 보관
+
         /*----------------------------------------------------------------------------
             보드판 격자 생성 및 초기화
         ----------------------------------------------------------------------------*/
@@ -115,18 +118,10 @@
 
                         block = new Block(gameBoard, x, y, blockSize, blockSize, 0, 1, piece.color);
                         fallingBlocks.push(block);
-
-                        //생성할 자리에 이미 블럭이 존재하면 게임 오버
-                        //오류 있음 -> 따로 함수로 빼야 할 듯
-                        // let row = Math.floor(y / blockSize);
-                        // let col = Math.floor(x / blockSize);
-                        // if(board[row]?.[col] === 1){
-                        //     gameOverFlag = true;
-                        //     break;
-                        // }
                     }
                 }
             }
+            canHold = true;
         }
 
         /*----------------------------------------------------------------------------
@@ -299,6 +294,61 @@
             }
         }
 
+        /*----------------------------------------------------------------------------
+            블록 보관(Hold)
+        ----------------------------------------------------------------------------*/
+        function holdBlock(){
+            if(!canHold) return;    //한 턴에 한 번만 체크
+            
+            //복사본 저장
+            let currentBlocks = fallingBlocks.map(b=>{
+                new Block(document.getElementById("gameBoard"),b.x, b.y, b.width, b.height, b.velX, b.velY, b.color);
+            });
+
+            //기존 블록 삭제
+            fallingBlocks.forEach(block => block.remove());
+            fallingBlocks = [];
+
+
+            if (holdPiece == null) {
+                holdPiece = currentBlocks;
+                createBlock(); // 랜덤 블록 새로 생성
+            } else {
+                let temp = holdPiece;
+                holdPiece = currentBlocks;
+
+                fallingBlocks = temp.map(b =>{
+                    new Block(document.getElementById("gameBoard"), b.x, b.y, b.width, b.height, b.velX, b.velY, b.color);
+                });
+            }
+
+            renderHoldBlock(holdPiece);
+            canHold = false;
+        }
+
+        function renderHoldBlock(blocks){
+            let holdArea = document.querySelector("#hold div");
+            holdArea.innerText = "";
+
+            let baseX = 30;
+            let baseY = 30;
+
+            if (!blocks || blocks.length === 0) return;
+
+            const minX = Math.min(...blocks.map(b => b.x));
+            const minY = Math.min(...blocks.map(b => b.y)); 
+
+            for(let block of blocks){
+                const offsetX = block.x / blockSize; // 블록 좌표를 셀 기준으로 변환
+                const offsetY = block.y / blockSize;
+
+                const x = baseX + offsetX * blockSize;
+                const y = baseY + offsetY * blockSize;
+
+                const newBlock = new Block(holdArea, x, y, blockSize, blockSize, 0, 0, "red");
+                newBlock.render(); // 위치 반영
+            }
+        }
 
         /*----------------------------------------------------------------------------
             게임 오버
@@ -408,7 +458,12 @@
                         hardDrop();
                         e.preventDefault(); //스페이스로 버튼 눌림 방지
                         break;
-
+                    case 67:    //c
+                        holdBlock();
+                        break;
+                    case 27:    //esc
+                        bt.click();
+                        break;
                 }
             });
 
