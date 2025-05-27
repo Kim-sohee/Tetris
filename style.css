@@ -57,6 +57,18 @@
 #aside button:hover{
     background-color: yellow;
 }
+#aside a{
+    text-decoration: none;
+    font-size: 15px;
+    color: white;
+    position: absolute;
+    top: 96%;
+    left: 82%;
+}
+#aside a:hover{
+    color:red;
+}
+
 #content{
     width: 500px;
     height: 100%;
@@ -68,8 +80,8 @@
 }
 #gameContainer{
     position: relative;
-    width: 302px;
-    height: 602px;
+    width: 304px;
+    height: 604px;
     border: 2px solid #000;
     background-color:#eee;
 }
@@ -84,4 +96,38 @@
     height: 30px;
     background-color: #eee;
     border: 1px solid #ddd;
+}
+/* modal */
+.modal{
+    display: none;
+    position: absolute;
+    z-index: 1;
+    padding-top: 50px;
+    margin: auto;
+    left: 0;
+    top: 0;
+    width: 800px;
+    height: 700px;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+.modalContent{
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+.close{
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close:hover,
+.close:focus{
+    color:#000;
+    text-decoration: none;
+    cursor: pointer;
 }
