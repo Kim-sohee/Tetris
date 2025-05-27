@@ -10,9 +10,12 @@ class Block extends GameObject{
     }
 
     render(){
-        //여기서 충돌 검사?
-
         this.div.style.left = this.x + "px";
         this.div.style.top = this.y + "px";
+    }
+
+    //블럭 삭제
+    remove(){
+        this.container.removeChild(this.div);
     }
 }
