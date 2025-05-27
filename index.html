@@ -17,6 +17,7 @@
         let blockSize = 30; //블록 사이즈
         let block;
         let fallingBlocks = []; //모든 블럭 저장
+        let blockMap =  Array.from({ length: rows }, () => Array(cols).fill(null)); //맵 안에 블럭 저장
         let interval=null;
 
         let score = 0;
@@ -210,21 +211,7 @@
             한 줄 채우면 삭제
         ----------------------------------------------------------------------------*/
         //줄 삭제 후 블럭 아래로 이동
-        function clearLine(line) {
-            for (let r = line; r > 0; r--) {
-                for (let c = 0; c < cols; c++) {
-                    board[r][c] = board[r - 1][c];
-                }
-            }
-
-            // 맨 위 줄은 비워줌
-            for (let c = 0; c < cols; c++) {
-                board[0][c] = 0;
-            }
-            score += 10;    //한줄 삭제 시 10점씩 올라감
-        }
-        // 줄이 가득 찼는지 검사
-        function checkClearLines(){
+        function clearLines() {
             for (let row = rows - 1; row >= 0; row--) {
                 let isFull = true;
 
@@ -234,12 +221,41 @@
                         break;
                     }
                 }
+
                 if (isFull) {
-                    clearLine(row);
-                    row++;  // 삭제 후 아래 줄을 다시 검사해야 하므로 인덱스를 다시 증가시킴
+                    // 블록 제거
+                    for (let col = 0; col < cols; col++) {
+                        let block = blockMap[row][col];
+                        if (block) {
+                            block.remove(); // Block 클래스 안의 DOM element 제거
+                        }
+                    }
+
+                    // 위의 모든 줄을 한 줄씩 아래로 내리기
+                    for (let r = row; r > 0; r--) {
+                        for (let c = 0; c < cols; c++) {
+                            board[r][c] = board[r - 1][c];
+                            blockMap[r][c] = blockMap[r - 1][c];
+
+                            if (blockMap[r][c]) {
+                                blockMap[r][c].y += blockSize;
+                                blockMap[r][c].render(); // DOM 위치 갱신
+                            }
+                        }
+                    }
+
+                    // 맨 윗줄 비우기
+                    for (let c = 0; c < cols; c++) {
+                        board[0][c] = 0;
+                        blockMap[0][c] = null;
+                    }
+
+                    row++; // 같은 줄 다시 체크 (위에서 내려온 게 있을 수 있으니)
+                    score+=10;
                 }
             }
         }
+
 
         /*----------------------------------------------------------------------------
             게임 오버
@@ -279,14 +295,16 @@
                     let col = Math.floor(block.x / blockSize);
                     if (row >= 0 && row < rows && col >= 0 && col < cols) {
                         board[row][col] = 1;
+                        blockMap[row][col] = block;
                         block.div.style.backgroundColor = '#4A4A4A';
                     }
                 }
                 fallingBlocks = [];
-                checkClearLines();
+                clearLines();   //이게 문제임
                 createBlock();
             }
-            
+            document.querySelector("#data span:nth-of-type(1)").innerText = score;  //score
+            document.querySelector("#data span:nth-of-type(2)").innerText = level;  //level
         }
 
         /*----------------------------------------------------------------------------
