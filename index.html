@@ -126,13 +126,15 @@
         function rotationBlock(blockArray){
             /*방법1) Block객체를 BlockGroup으로 묶어서 처리하기
                 -> (장점) 코드 간결화, 유지보수성 향상, 식별성 향상 
-                -> (단점) 대공사.. 대부분의 코드를 뜯어 고쳐야 함
+                -> (단점) 대공사.. 대부분의 코드를 뜯어 고쳐야 함, 시간 부족
               방법2) 객체 자체의 x, y값을 변경하기
                 -> (장점) 기존의 코드 변경 없이 작성 가능
-                -> (단점) 복잡한 로직, 더러운 코드, 식별성 저하, 유지보수성 저하 */
+                -> (단점) 복잡한 로직, 더러운 코드, 식별성 저하, 유지보수성 저하 
+                    근데 어쩔수 없다.. 이걸로 ㄱㄱ    
+            */
 
         //*************** 시간 관계상 방법 2로 진행, 이후에 리페토링 고려 (5/27) ***************
-            let centerBlock = blockArray[1]; 
+            let centerBlock = blockArray[1];    //중심 블럭 지정
             let centerX = centerBlock.x;
             let centerY = centerBlock.y;
 
@@ -148,25 +150,25 @@
                 let newY = centerY + newRelY * blockSize;
 
                 return {
-                    ...block,
+                    ...block,   //구조분해
                     x: newX,
                     y: newY
                 };
             });
 
-            // 충돌 체크
-            let isValid = true;
+            // 충돌 체크(충돌이면 true)
+            let isValid = false;
             for(let block of rotated){
                 let row = Math.floor(block.y / blockSize);
                 let col = Math.floor(block.x / blockSize);
                 if(row < 0 || row >= rows || col < 0 || col >= cols || board[row][col] !== 0){
-                    isValid = false;
+                    isValid = true;
                     break;
                 }
             }
 
-            // 반영
-            if(isValid){
+            // 충돌 없으면 좌표 반영
+            if(!isValid){
                 for(let i = 0; i < blockArray.length; i++){
                     blockArray[i].x = rotated[i].x;
                     blockArray[i].y = rotated[i].y;
