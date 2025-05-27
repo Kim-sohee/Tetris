@@ -46,12 +46,32 @@
 
         //초기화 함수
         function init(){
+            //블럭 요소 제거
+            fallingBlocks.forEach(block => block.remove());
+            fallingBlocks=[];
+
+            //게임보드 초기화
+            board = Array.from({length:rows}, ()=> Array(cols).fill(0));
+            blockMap = Array.from({length:rows}, ()=> Array(cols).fill(null));
+
+            //보드 새로 그리기
             createBoard();
+
+            //점수와 레벨 초기화
             score = 0; level = 0;
             document.querySelector("#data span:nth-of-type(1)").innerText = score;  //score
             document.querySelector("#data span:nth-of-type(2)").innerText = level;  //level
+            
+            //버튼 초기화
             document.querySelector("#aside button").innerText = "GAME START";
+            //게임 오버 플래그 초기화
             gameOverFlag = false;
+
+            //인터벌 제거
+            if(interval!= null){
+                clearInterval(interval);
+                interval = null;
+            }
         }
 
         /*----------------------------------------------------------------------------
@@ -69,6 +89,22 @@
             ];
             let piece = tetroBlock[getRandom(tetroBlock.length-1)];
             let gameBoard = document.getElementById("gameBoard");
+
+            //게임오버 감지
+            for(let i=0; i<piece.shape.length; i++){
+                for (let j = 0; j < piece.shape[i].length; j++) {
+                    if (piece.shape[i][j] === 1) {
+                        let x = j * blockSize + 90;   //중앙에서 시작하기
+                        let y = i * blockSize;
+                        const boardY = Math.floor(y / blockSize);
+                        const boardX = Math.floor(x / blockSize);
+                        if (board[boardY]?.[boardX] == 1) {
+                            gameOverFlag = true;
+                            return; // 블럭 생성하지 않고 종료
+                        }
+                    }
+                }
+            }
 
             //tetroBlock 배열에서 1인 곳마다 Block 생성
             for(let i=0; i<piece.shape.length; i++){
@@ -268,8 +304,7 @@
             게임 오버
         ----------------------------------------------------------------------------*/
         function gameOver(){
-            // alert("GAME OVER!\n당신의 최종 점수는 "+score+"점 입니다.");
-            console.log("GAME OVER!\n당신의 최종 점수는 "+score+"점 입니다.");
+            alert("GAME OVER!\n당신의 최종 점수는 "+score+"점 입니다.");
             init(); //초기화
         }
 
