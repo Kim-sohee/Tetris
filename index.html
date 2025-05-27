@@ -130,23 +130,22 @@
               방법2) 객체 자체의 x, y값을 변경하기
                 -> (장점) 기존의 코드 변경 없이 작성 가능
                 -> (단점) 복잡한 로직, 더러운 코드, 식별성 저하, 유지보수성 저하 */
-            let centerX = 0;
-            let centerY = 0;
 
-            for(let block of blockArray){
-                centerX += block.x;
-                centerY += block.y;
-            }
-            centerX /= blockArray.length;
-            centerY /= blockArray.length;
+        //*************** 시간 관계상 방법 2로 진행, 이후에 리페토링 고려 (5/27) ***************
+            let centerBlock = blockArray[1]; 
+            let centerX = centerBlock.x;
+            let centerY = centerBlock.y;
 
-            let rotated = blockArray.map(block=>{
-                let relX = block.x - centerX;
-                let relY = block.y - centerY;
+            let rotated = blockArray.map(block => {
+                let relX = Math.round((block.x - centerX) / blockSize);
+                let relY = Math.round((block.y - centerY) / blockSize);
 
-                // 90도 회전 좌표 (시계방향)
-                let newX = centerX - relY;
-                let newY = centerY + relX;
+                // 시계 방향 회전
+                let newRelX = -relY;
+                let newRelY = relX;
+
+                let newX = centerX + newRelX * blockSize;
+                let newY = centerY + newRelY * blockSize;
 
                 return {
                     ...block,
@@ -154,18 +153,19 @@
                     y: newY
                 };
             });
-            // 회전 후 충돌 체크
+
+            // 충돌 체크
             let isValid = true;
-            for(let b of rotated){
-                let row = Math.floor(b.y / blockSize);
-                let col = Math.floor(b.x / blockSize);
+            for(let block of rotated){
+                let row = Math.floor(block.y / blockSize);
+                let col = Math.floor(block.x / blockSize);
                 if(row < 0 || row >= rows || col < 0 || col >= cols || board[row][col] !== 0){
                     isValid = false;
                     break;
                 }
             }
 
-            // 충돌 없으면 실제 좌표 반영
+            // 반영
             if(isValid){
                 for(let i = 0; i < blockArray.length; i++){
                     blockArray[i].x = rotated[i].x;
@@ -219,6 +219,7 @@
             for (let c = 0; c < cols; c++) {
                 board[0][c] = 0;
             }
+            score += 10;    //한줄 삭제 시 10점씩 올라감
         }
         // 줄이 가득 찼는지 검사
         function checkClearLines(){
