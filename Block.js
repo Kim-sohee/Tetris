@@ -1,6 +1,8 @@
 class Block extends GameObject{
     constructor(container, x, y, width, height, velX, velY, color){
         super(container, x, y, width, height, velX, velY, color);
+
+        this.div.style.borderRadius = 0+"px";
     }
 
     //메서드 오버라이딩
