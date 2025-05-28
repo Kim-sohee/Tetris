@@ -24,6 +24,11 @@
         let level = 0;
         let gameOverFlag = false;   //게임이 오버되었는지 확인
 
+        let holdPiece = null;   //보관 중인 블럭 정보
+        let canHold = true;     //한 턴에 한 번만 보관
+
+        let nextPiece = null;
+
         /*----------------------------------------------------------------------------
             보드판 격자 생성 및 초기화
         ----------------------------------------------------------------------------*/
@@ -49,6 +54,10 @@
             //블럭 요소 제거
             fallingBlocks.forEach(block => block.remove());
             fallingBlocks=[];
+
+            //Next 초기화
+            nextPiece = null;
+            document.querySelector("#hold div").innerHTML="";
 
             //게임보드 초기화
             board = Array.from({length:rows}, ()=> Array(cols).fill(0));
@@ -90,43 +99,58 @@
             let piece = tetroBlock[getRandom(tetroBlock.length-1)];
             let gameBoard = document.getElementById("gameBoard");
 
-            //게임오버 감지
-            for(let i=0; i<piece.shape.length; i++){
-                for (let j = 0; j < piece.shape[i].length; j++) {
-                    if (piece.shape[i][j] === 1) {
+            //nextPiece 설정
+            if(!nextPiece){
+                nextPiece = tetroBlock[getRandom(tetroBlock.length-1)];
+            }
+            fallingBlocks = [];
+
+            //tetroBlock 배열에서 1인 곳마다 Block 생성
+            for(let i=0; i<nextPiece.shape.length; i++){
+                for(let j=0; j<nextPiece.shape[i].length; j++){
+                    if(nextPiece.shape[i][j] == 1){
                         let x = j * blockSize + 90;   //중앙에서 시작하기
                         let y = i * blockSize;
+
+                        //게임 오버 검사
                         const boardY = Math.floor(y / blockSize);
                         const boardX = Math.floor(x / blockSize);
                         if (board[boardY]?.[boardX] == 1) {
                             gameOverFlag = true;
                             return; // 블럭 생성하지 않고 종료
                         }
-                    }
-                }
-            }
 
-            //tetroBlock 배열에서 1인 곳마다 Block 생성
-            for(let i=0; i<piece.shape.length; i++){
-                for(let j=0; j<piece.shape[i].length; j++){
-                    if(piece.shape[i][j] == 1){
-                        let x = j * blockSize + 90;   //중앙에서 시작하기
-                        let y = i * blockSize;
-
-                        block = new Block(gameBoard, x, y, blockSize, blockSize, 0, 1, piece.color);
+                        block = new Block(gameBoard, x, y, blockSize, blockSize, 0, 1, nextPiece.color);
                         fallingBlocks.push(block);
-
-                        //생성할 자리에 이미 블럭이 존재하면 게임 오버
-                        //오류 있음 -> 따로 함수로 빼야 할 듯
-                        // let row = Math.floor(y / blockSize);
-                        // let col = Math.floor(x / blockSize);
-                        // if(board[row]?.[col] === 1){
-                        //     gameOverFlag = true;
-                        //     break;
-                        // }
                     }
                 }
             }
+
+            nextPiece = tetroBlock[getRandom(tetroBlock.length-1)];
+            renderNextBlock(nextPiece);
+
+            canHold = true;
+        }
+
+        function renderNextBlock(piece){
+            const holdArea = document.querySelector("#hold div");
+            holdArea.innerHTML = "";    //초기화
+
+            const baseX=40;
+            const baseY=130;
+
+            for (let i = 0; i < piece.shape.length; i++) {
+                for (let j = 0; j < piece.shape[i].length; j++) {
+                    if (piece.shape[i][j] === 1) {
+                        let x = baseX + j * blockSize;
+                        let y = baseY + i * blockSize;
+
+                        let block = new Block(holdArea, x, y, blockSize, blockSize, 0, 0, piece.color);
+                        block.render();
+                    }
+                }
+            }
+
         }
 
         /*----------------------------------------------------------------------------
@@ -299,6 +323,63 @@
             }
         }
 
+        /*----------------------------------------------------------------------------
+            블록 보관(Hold)
+        ----------------------------------------------------------------------------*/
+        function holdBlock(fallingBlocks){
+            if(!canHold) return;    //한 턴에 한 번만 체크
+            
+            //복사본 저장
+            let currentBlocks = fallingBlocks.map(b =>
+                new Block(
+                    document.querySelector("#hold div"), // 가짜 컨테이너
+                    b.x, b.y, b.width, b.height, b.velX, b.velY, b.color
+                )
+            );
+
+            //기존 블록 삭제
+            fallingBlocks.forEach(block => block.remove());
+            fallingBlocks = [];
+
+            if (holdPiece == null) {
+                holdPiece = currentBlocks;
+                createBlock(); // 랜덤 블록 새로 생성
+            } else {
+                let temp = holdPiece;
+                holdPiece = currentBlocks;
+
+                fallingBlocks = temp.map(b =>{
+                    new Block(document.getElementById("gameBoard"), b.x, b.y, b.width, b.height, b.velX, b.velY, b.color);
+                });
+            }
+
+            renderHoldBlock(holdPiece);
+            canHold = false;
+        }
+
+        function renderHoldBlock(blocks){
+            let holdArea = document.querySelector("#hold div");
+            holdArea.innerText = "";
+
+            let baseX = -30;
+            let baseY = 80;
+
+            if (!blocks || blocks.length === 0) return;
+
+            const minX = Math.min(...blocks.map(b => b.x));
+            const minY = Math.min(...blocks.map(b => b.y)); 
+
+            for(let block of blocks){
+                const offsetX = block.x / blockSize; // 블록 좌표를 셀 기준으로 변환
+                const offsetY = block.y / blockSize;
+
+                const x = baseX + offsetX * blockSize;
+                const y = baseY + offsetY * blockSize;
+
+                const newBlock = new Block(holdArea, x, y, blockSize, blockSize, 0, 0, "red");
+                newBlock.render(); // 위치 반영
+            }
+        }
 
         /*----------------------------------------------------------------------------
             게임 오버
@@ -408,7 +489,12 @@
                         hardDrop();
                         e.preventDefault(); //스페이스로 버튼 눌림 방지
                         break;
-
+                    case 67:    //c
+                        // holdBlock(fallingBlocks);
+                        break;
+                    case 27:    //esc
+                        bt.click();
+                        break;
                 }
             });
 
@@ -434,7 +520,7 @@
     <div id="wrapper">
         <div id="aside">
             <div id="hold">
-                <h2>HOLD</h2>
+                <h2>NEXT</h2>
                 <div></div>
             </div>
             <div id="data">
@@ -457,7 +543,6 @@
                         <h3> 방향키 ↓ : 아래로 한 칸 이동</h3>
                         <h3> 방향키 ↑ : 블럭 회전</h3>
                         <h3> 스페이스바 : 드롭 다운</h3>
-                        <br>
                         <h2>점수</h2>
                         <h3>한 줄이 없어지면 10접을 획득합니다.</h3>
                         <h3>50점을 획득할 때마다 레벨이 1씩 올라갑니다.</h3>
