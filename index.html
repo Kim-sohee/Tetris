@@ -25,6 +25,7 @@
         let gameOverFlag = false;   //게임이 오버되었는지 확인
 
         let nextPiece = null;
+        let isfixed = false;
 
         /*----------------------------------------------------------------------------
             보드판 격자 생성 및 초기화
@@ -331,6 +332,8 @@
             게임 루프 생성
         ----------------------------------------------------------------------------*/
         function gameLoop(){
+            if(isfixed) return;
+            
             if(fallingBlocks.length === 0){
                 createBlock();  //블럭 생성
                 return;
@@ -350,6 +353,7 @@
             }
 
             if(check){
+                isfixed = true;
                 for(let i=0; i<fallingBlocks.length; i++){
                     let block = fallingBlocks[i];
 
@@ -364,6 +368,10 @@
                 fallingBlocks = [];
                 clearLines();
                 createBlock();
+
+                setTimeout(()=>{
+                    isfixed = false;
+                }, 100);
             }
             level = Math.floor(score/50);
             document.querySelector("#data span:nth-of-type(1)").innerText = score;  //score
