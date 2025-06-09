@@ -8,10 +8,19 @@
 
 ### 기능 흐름도
 본 프로젝트의 전체적인 흐름은 다음과 같다.
-<br>![Image](https://github.com/user-attachments/assets/59309333-c692-4572-8b94-4e391b5da6d5)<br>
+<br><img src="https://github.com/user-attachments/assets/59309333-c692-4572-8b94-4e391b5da6d5" width="300"/><br>
 1. 게임 시작 시, 첫 번째 블록이 랜덤으로 생성된다.
 2. 사용자는 키보드 입력을 통해 블록을 좌우로 이동, 회전, 하강시킬 수 있다.
 3. 블록이 아래로 내려가거나 고정될 때마다 충돌을 감지하고, 고정된 블록은 배열에 저장된다.
 4. 고정 후, 라인이 완성되었는지 검사하여 한 줄 이상이 꽉 차면 해당 줄을 제거하고 점수를 획득한다.
 5. 이후 게임 종료 조건을 확인하고, 종료 조건에 도달하지 않았다면 다음 블록을 생성하여 게임을 반복한다.
 
+### 기능 구현
+
+
+### 동작 미리보기
+https://github.com/user-attachments/assets/49a8786b-2555-4ac1-98ac-1c8238918354
+https://github.com/user-attachments/assets/661a595d-b621-41c5-9b86-988f05e5909b
+
+### 시연
+https://kim-sohee.github.io/Tetris/
